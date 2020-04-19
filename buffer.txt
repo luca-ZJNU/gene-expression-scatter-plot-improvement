@@ -1,0 +1,159 @@
+1.
+semaphore isempty = 1; 
+semaphore isfull = 0; #定义两个信号量，分别表示盘子未满和满
+stack = [] 			# 定义一个堆栈作为盘子
+
+void father(){
+	if(stack[0]==null){
+	p(isempty)
+	stack.append("apple")
+	v(isfull)
+	}
+}
+
+void mother(){
+	if(stack[0]==null){
+	p(isempty)
+	stack.append("orange")
+	v(isfull)
+	}
+}
+
+void son(){
+	if(stack[0]=="orange"){
+	p(isfull)
+	stack.pop()
+	v(isempty)
+	}
+}
+void daughter(){
+	if(stack[0]=="apple"){
+	p(isfull)
+	stack.pop()
+	v(isempty)
+	}
+}
+
+
+2.
+
+semaphore wmutex = 1; 			#为井定义一个互斥信号量 well mutex
+semaphore available = 3; 		#为水桶定义私有变量,分别表示 还有多少个水桶可用 
+
+semaphore smutex = 1; 			#为水缸定义一个互斥信号量 stack mutex
+semaphore empty,full = 10,0;	#为水缸定义私有变量，分别表示 还能容纳多少水 和容纳了多少水能容纳容纳。
+
+#从水井中打水。
+void get_water_from_well(){
+	p(available)
+	p(wmutex)
+	....
+	v(wmutex)
+	v(available)
+
+}
+
+#把水倒入水缸中
+void pull_water_into_stack(){
+	p(empty)
+	p(smutex)
+	....
+	v(smutex)
+	v(full)
+}
+
+#老和尚从水缸中喝水
+void drink_water_from_stack(){
+	p(full)
+	p(smutex)
+	....
+	v(smutex)
+	v(empty)
+}
+3.semaphore mutex1 = 1;  	#为货架F1定义公有信号量。
+semaphore mutex2 = 1;  	#为货架F2定义公有信号量。
+semaphore empty1, full1 = 10,0; 	#货架F1定义私有信号量，分别表示还能存储多少零件，和存储量多少个零件
+semaphore empty2, full2 = 10,0;		#货架F2定义私有信号量，分别表示还能存储多少零件，和存储量多少个零件
+
+#生产A产品,并放到F1货架上
+void produceA(){
+	p(empty1)
+	p(mutex1)
+	....
+	v(mutex1)
+	v(full1)
+}
+
+
+#生产B产品,并放到F2货架上
+void produceA(){
+	p(empty2)
+	p(mutex2)
+	....
+	v(mutex2)
+	v(full2)
+}
+
+#组装A，B两个产品
+void compose(){
+	p(full1)
+	p(full2)
+	p(mutex1)
+	p(mutex2)
+	.....
+	v(mutex2)
+	v(mutex1)
+	v(empty1)
+	v(empty2)
+}
+
+4.
+(1). 是，p5,p1,p2,p4,p3
+(2). 不能，因为P4的请求已经超出了自己所需的资源
+(3). 能，请求的资源数小于自己需求数，剩余资源数也能满足请求的资源数，并且存在一个安全序列
+(4). 不能，虽然请求的资源数小于自己需求数，剩余资源数也能满足请求的资源数，但如果分配给P1，就不存在一个安全序列
+
+
+1.
+time 				work
+10:00-10:35 		1
+10:35-10:55			4
+10:55-11:25			2
+11:25-11:55			5
+11:55-12:40			3
+
+2.
+		work	1	2	3	4	5
+time comsume	35  30	45	20	30
+
+avg_time_comsuming = (35+30+45+20+30)/5 = 32 (min)
+
+
+
+1.
+time 				work
+10:00-10:20			A
+10:20-10:50			B
+10:50-11:10			A
+11:10-12:00			C
+12:00-12:20			D
+
+2.
+		work	1	2	3	4	
+time comsume	70	30	50	20
+
+avg_time_comsuming = (70+30+50+20)/4 = 42.5	(mins)
+
+process		having(R0, R1, R2, R3, R4)		still_NEED(R0, R1, R2, R3, R4)
+					以占有的资源					还需的资源
+P0				(1,0,0,0,0)					(0,1,1,0,0)
+
+P1				(1,0,0,1,0)					(0,0,0,0,1)
+
+P2				(0,1,1,0,0)					(0,0,0,0,0)
+
+P3				(0,0,1,0,0)					(0,0,0,1,0)
+
+P4				(0,0,0,0,1)					(0,0,0,1,0)
+
+由于唯一的R3资源被P1占有，还需要R4，但唯一的R4资源被P4占有，还需要R3，P1与P4形成死锁，不存在安全序列 ，所以会导致死锁
